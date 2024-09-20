@@ -18,6 +18,7 @@ void rc_control_init(void)
 static void ppm_to_rc(void)
 {
     rc_input.ch1 = ;
+    //todo
 }
 
 void pilot_cmd_collect()
