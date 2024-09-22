@@ -4,6 +4,7 @@
 
 #include "sensor_driver.h"
 #include "systim.h"
+#include "uart_imu.h"
 
 typedef struct {
   uint32_t timestamp;

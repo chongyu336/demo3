@@ -7,6 +7,11 @@
         "usbd_ioreq.h": "c",
         "usbd_cdc.h": "c",
         "usbd_cdc_if.h": "c",
-        "usbd_desc.h": "c"
+        "usbd_desc.h": "c",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp"
     }
 }

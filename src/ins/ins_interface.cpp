@@ -1,3 +1,11 @@
+/*
+ * @Author: ADSW514610085 Z514610085@163.com
+ * @Date: 2024-09-20 10:55:02
+ * @LastEditors: ADSW514610085 Z514610085@163.com
+ * @LastEditTime: 2024-09-20 17:01:20
+ * @FilePath: \demo3\src\ins\ins_interface.cpp
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #include "ins_interface.h"
 
 
@@ -21,7 +29,7 @@ TimeTag ins_interval ={
 void ins_interface_init()
 {
     
-    sensor_init();
+    //sensor_init();
 }
 
 uint32_t last_timestamp;
@@ -108,10 +116,13 @@ static void ins_step()
         imu_upadte = 0;
         //滤波函数得到四元数和姿态角
         //待实现
-        imu_bus.ang_roll = ;
-        imu_bus.ang_pitch = ;
-        imu_bus.ang_yaw = ;
-        imu_bus.quat = ;
+        imu_bus.ang_roll = uartImu.imuHandle.zitai[0];
+        imu_bus.ang_pitch = uartImu.imuHandle.zitai[1];
+        imu_bus.ang_yaw = uartImu.imuHandle.zitai[2];
+        imu_bus.quat[0] = uartImu.imuHandle.siyuanshu[0];
+        imu_bus.quat[1] = uartImu.imuHandle.siyuanshu[1];
+        imu_bus.quat[2] = uartImu.imuHandle.siyuanshu[2];
+        imu_bus.quat[3] = uartImu.imuHandle.siyuanshu[3];
     }
     if(mag_update)
     {

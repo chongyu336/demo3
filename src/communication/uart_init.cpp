@@ -28,7 +28,7 @@ extern void (*uart6_init)(void);
 CommunicationProtocol *userComm;
 UartComputer uartComputer; // uart1
 UartIMU uartImu;           // uart2
-// UartAtkTof uartTof;        // uart3
+UartAtkTof uartTof;        // uart3
 // UartWifi uartWifi;      // uart4
 // UartSbus uartSbus;      // uart5
 UartComputer uart485; // uart6

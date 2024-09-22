@@ -45,7 +45,7 @@ void vThreadSetup(void *pvParameters)
 
     tim_init();
     pwm_caputure_init();
-    ppmInst.init(1E-6F);
+  
 
     W25QXX_Init();
     // W25QXX_test_write(info);
@@ -62,7 +62,7 @@ void vThreadSetup(void *pvParameters)
     // pwm_shutdown();
 
     // sampler.powerEnSet(10, 1); // 52V 电源常开
-
+    
     // pwm_speed_set(0, 0.0f);
     // pwm_speed_set(1, 0.5f);
     // pwm_speed_set(2, 1.0f);
@@ -81,7 +81,7 @@ void vThreadSetup(void *pvParameters)
         // sprintf(info, "duty = %0.1f\r\n", duty);
         // usbComm.send(info);
 
-        // sprintf(info, "tof longest distance = %0.3fm\r\n", uartTof.longestDistance);
+        //sprintf(info, "tof longest distance = %0.3fm\r\n", uartTof.longestDistance);
         // usbComm.send(info);
 
         // if (ppmInst.IsUpdated())
