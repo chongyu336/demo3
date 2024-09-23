@@ -1,8 +1,10 @@
-#include <something.h>
-
-static struct rtos_event event_vehicle;
-static struct rtos_timer timer_vehicle;
-
+//#include <something.h>
+#include "stm32f4xx_hal.h" //不会出现数字类型定义错误
+//static struct rtos_event event_vehicle;
+//static struct rtos_timer timer_vehicle;
+#include "ins_interface.h"
+#include "fms_interface.h"
+#include "control_interface.h"
 /**
  * @brief Vehicle task init
  */
@@ -18,7 +20,7 @@ void task_vehicle_init(void)
     control_interface_init();
 
     /* create event */
-    rtos_event_init(&event_vehicle, "vehicle", FLAG);
+    //rtos_event_init(&event_vehicle, "vehicle", FLAG);
     
     /* register a 1kHz timer connected with event */
     rtos_timer_create(&timer_vehicle, "vehicle", timer_vehicle_update, NULL, 1, TIMER_FLAG_PERIODIC);
@@ -48,6 +50,7 @@ void task_vehicle_entry(void* parameter)
 
         if (res == 0) {
             if (recv_set & EVENT_VEHICLE_UPDATE) {
+
                 time_now = systime_now_ms();
                 /* record loop start time */
                 if (time_start == 0) {
@@ -72,7 +75,7 @@ void task_vehicle_entry(void* parameter)
                 /* run Controller model every control_period */
                 PERIOD_EXECUTE(control_step, control_period, time_now, control_interface_step(timestamp););
 
-                /* send actuator command */
+                /* send actuator command */3
                 send_actuator_cmd();
             }
         }

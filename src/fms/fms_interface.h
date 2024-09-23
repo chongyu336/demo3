@@ -3,7 +3,8 @@
 
 #include "rc_control.h"
 #include "gcs_control.h"
-#include "main.h"
+//#include "gcs_control.h"
+#include <main.h>
 #include "ins_interface.h"
 
 

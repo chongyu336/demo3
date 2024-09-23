@@ -202,7 +202,7 @@ static void thrust_zero()
 
 static void control_step()
 {
-    if(ctrl_bus.ctrl_fms_bus.fms_out.status == Arm)
+    if(ctrl_bus.ctrl_fms_bus->fms_out.status == Arm)
     {
         ctrl_bus.att_controller.roll_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_roll;
         ctrl_bus.att_controller.pitch_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_pitch;

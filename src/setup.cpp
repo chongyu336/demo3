@@ -109,3 +109,9 @@ void vThreadSetup(void *pvParameters)
     // sprintf(info, "led stack remainsize %d, uart stack remainsize %d, stack remainsize %d\n",
     //        (int)uxTaskGetStackHighWaterMark(led_thread_id), (int)uxTaskGetStackHighWaterMark(uart_thread_id), (int)uxTaskGetStackHighWaterMark(NULL));
 }
+
+//uint32_t systime_now_ms()
+//{
+
+//}
+

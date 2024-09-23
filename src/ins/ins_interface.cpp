@@ -2,11 +2,13 @@
  * @Author: ADSW514610085 Z514610085@163.com
  * @Date: 2024-09-20 10:55:02
  * @LastEditors: ADSW514610085 Z514610085@163.com
- * @LastEditTime: 2024-09-20 17:01:20
+ * @LastEditTime: 2024-09-23 11:24:08
  * @FilePath: \demo3\src\ins\ins_interface.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #include "ins_interface.h"
+
+#include <uart_imu.h>
 
 
 extern imu_data_t imu_data;
