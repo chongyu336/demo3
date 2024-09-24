@@ -49,9 +49,20 @@ static float absself(float num)
         return -num;
     }
 }
-static float deadzone_range(float num1, float num2)
+// static float deadzone_range(float num1, float num2)//1000-2000
+// {
+//     if( absself(num1 - JOYSTICK_READ_NEUTRAL ) < num2)
+//     {
+//         return 0;
+//     }
+//     else{
+//         return num1;
+//     }
+// }
+
+static float deadzone_range(float num1, float num2)//-1 - 1
 {
-    if( absself(num1 - JOYSTICK_READ_NEUTRAL ) < num2)
+    if( absself(num1 - JOYSTICK_READ_NEUTRAL1 ) < num2)
     {
         return 0;
     }
@@ -79,7 +90,7 @@ void fms_interface_step(uint32_t timestamp)
   if (rc_updated)
   {
     fms_bus.fms_rc_input = &rc_input;
-    //fms_bus.fms_rc_input->timestamp = timestamp;
+    fms_bus.fms_rc_input->timestamp = timestamp;
   }
   else
   {
@@ -112,96 +123,145 @@ static void FMS_step(void)
     }
     //模式判断
     //待实现
-    if(1) //原条件fms_bus.fms_rc_input->sw2 ==
+    if(fms_bus.fms_rc_input->sw2 == RC_SW_UP && fms_bus.fms_rc_input->sw4 == RC_SW_UP) 
     {
-      //fms_bus.fms_out.mode = 
+      fms_bus.fms_out.mode = Stabilize;
     }
-    else if(1) //原条件fms_bus.fms_rc_input->sw3 == 
+    else if(fms_bus.fms_rc_input->sw2 == RC_SW_UP && fms_bus.fms_rc_input->sw4 == RC_SW_DOWN ) 
     {
-
+      fms_bus.fms_out.mode = Atthold;
     }
-
-    float rollstick = deadzone_range(fms_bus.fms_rc_input->ch1, 50);
-    float pitchstick = deadzone_range(fms_bus.fms_rc_input->ch2,50);
-    float throttlestick = deadzone_range(fms_bus.fms_rc_input->ch3,50);
-    float yawstick = deadzone_range(fms_bus.fms_rc_input->ch4,50);
-    float forwardstick = deadzone_range(fms_bus.fms_rc_input->ch5,50);
-    float lateralstick = deadzone_range(fms_bus.fms_rc_input->ch6,50);    
-
+    else if(fms_bus.fms_rc_input->sw2 == RC_SW_DOWN && fms_bus.fms_rc_input->sw4 == RC_SW_UP ) 
+    {
+      fms_bus.fms_out.mode = Depthhold;
+    }
+    else if(fms_bus.fms_rc_input->sw2 == RC_SW_DOWN && fms_bus.fms_rc_input->sw4 == RC_SW_DOWN ) 
+    {
+      fms_bus.fms_out.mode = Manual;
+    }
     //摄像头舵机控制
-    //fms_bus.fms_out.servo_cmd = ;
-
-    
-    //杆位输入，-1.0-1.0
-    float roll_desired = norm_input(rollstick)*Roll_Max;
-    float pitch_desired = norm_input(pitchstick)*Pitch_Max;
-    float yaw_rate_desired = norm_input(yawstick)*Yaw_Rate_Max;
-    float forwardout = norm_input(forwardstick) *Speed_x_Max;
-    float lateralout = norm_input(lateralstick)*Speed_y_Max;
-
-    uint32_t dt_ctrl = (fms_bus.fms_rc_input->timestamp >= last_timestamp) ? (fms_bus.fms_rc_input->timestamp - last_timestamp) : (0xFFFFFFFF - last_timestamp + fms_bus.fms_rc_input->timestamp);
-    last_timestamp = fms_bus.fms_rc_input->timestamp;
-    depth_desired += norm_input(throttlestick)*Speed_z_Max * dt_ctrl;
-
-    //传感器角度数据
-    float roll_feedback = fms_bus.fms_ins_bus->imu->ang_roll;
-    float pitch_feedback = fms_bus.fms_ins_bus->imu->ang_pitch;
-    float yaw_feedback = fms_bus.fms_ins_bus->imu->ang_yaw;
-
-    //传感器角速度数据
-    float roll_rate_feedback = fms_bus.fms_ins_bus->imu->gyr_x;
-    float pitch_rate_feedback = fms_bus.fms_ins_bus->imu->gyr_y;
-    float yaw_rate_feedback = fms_bus.fms_ins_bus->imu->gyr_z;
-
-    // if(yaw_feedback > 180)
-    // {
-    //     yaw_feedback = yaw_feedback - 360;
-    //     yaw_rate_feedback = - yaw_rate_feedback;
-    // }
-
-    //深度反馈
-    float depth_feedback = fms_bus.fms_ins_bus->bar->depth;
-    
-
-
+    if(fms_bus.fms_rc_input->sw4 == RC_SW_UP)
+    {
+      fms_bus.fms_out.servo_cmd = 1;
+    }
+    else if(fms_bus.fms_rc_input->sw4 == RC_SW_MID)
+    {
+      fms_bus.fms_out.servo_cmd = 0;
+    }
+    else if(fms_bus.fms_rc_input->sw4 == RC_SW_DOWN)
+    {
+      fms_bus.fms_out.servo_cmd = -1;
+    }
     mode_list cur_mode = fms_bus.fms_out.mode;
-    
-    if ((last_mode == Stabilize || last_mode == Depthhold) && cur_mode == Atthold)
-    {
-        fms_bus.fms_out.phi_cmd = roll_feedback;
-        fms_bus.fms_out.theta_cmd = pitch_feedback;
-        fms_bus.fms_out.psi_cmd = yaw_feedback;
-        fms_bus.fms_out.z_cmd = depth_desired;
-    }
-    else if ((last_mode == Stabilize || last_mode == Atthold) && cur_mode == Depthhold)
-    {
-        fms_bus.fms_out.phi_cmd = roll_desired;
-        fms_bus.fms_out.theta_cmd = pitch_desired;
-        fms_bus.fms_out.r_cmd = yaw_rate_desired;
-        fms_bus.fms_out.z_cmd = depth_feedback;
-    }
-    else if(last_mode == Atthold && cur_mode == Atthold)
-    {
-        fms_bus.fms_out.z_cmd = depth_desired;
-    }
-    else if(last_mode == Depthhold && cur_mode == Depthhold)
-    {
-        fms_bus.fms_out.phi_cmd = roll_desired;
-        fms_bus.fms_out.theta_cmd = pitch_desired;
-        fms_bus.fms_out.r_cmd = yaw_rate_desired;
-    }
-    else{
-        fms_bus.fms_out.phi_cmd = roll_desired;
-        fms_bus.fms_out.theta_cmd = pitch_desired;
-        fms_bus.fms_out.r_cmd = yaw_rate_desired;
-        fms_bus.fms_out.z_cmd = depth_desired;
-    }
+    // float rollstick = deadzone_range(fms_bus.fms_rc_input->ch1, 50);
+    // float pitchstick = deadzone_range(fms_bus.fms_rc_input->ch2,50);
+    // float throttlestick = deadzone_range(fms_bus.fms_rc_input->ch3,50);
+    // float yawstick = deadzone_range(fms_bus.fms_rc_input->ch4,50);
+    // float forwardstick = deadzone_range(fms_bus.fms_rc_input->ch5,50);
+    // float lateralstick = deadzone_range(fms_bus.fms_rc_input->ch6,50);    
 
-    fms_bus.fms_out.u_cmd = forwardout;
-    fms_bus.fms_out.v_cmd = lateralout;
 
+    float rollstick = deadzone_range(fms_bus.fms_rc_input->ch1, 0.05);
+    float pitchstick = deadzone_range(fms_bus.fms_rc_input->ch2,0.05);
+    float throttlestick = deadzone_range(fms_bus.fms_rc_input->ch3,0.05);
+    float yawstick = deadzone_range(fms_bus.fms_rc_input->ch4,0.05);
+    float forwardstick = deadzone_range(fms_bus.fms_rc_input->ch5,0.05);
+    float lateralstick = deadzone_range(fms_bus.fms_rc_input->ch6,0.05);    
+
+    if(fms_bus.fms_out.mode = Manual)
+    { 
+      float forwardout = forwardstick *Speed_x_Max;
+      float lateralout = lateralstick*Speed_y_Max;
+      float depthout = throttlestick* Speed_z_Max;
+      float rollout = rollstick*Roll_Rate_Max;
+      float pitchout = pitchstick*Pitch_Rate_Max;
+      float yawout = yawstick*Yaw_Rate_Max;
+
+      fms_bus.fms_out.u_cmd = forwardout;
+      fms_bus.fms_out.v_cmd = lateralout;
+      fms_bus.fms_out.w_cmd = depthout;
+      fms_bus.fms_out.p_cmd = rollout;
+      fms_bus.fms_out.q_cmd = pitchout;
+      fms_bus.fms_out.r_cmd = yawout;
+    }
+    else
+    {
+      //杆位输入，-1.0-1.0
+      // float roll_desired = norm_input(rollstick)*Roll_Max;
+      // float pitch_desired = norm_input(pitchstick)*Pitch_Max;
+      // float yaw_rate_desired = norm_input(yawstick)*Yaw_Rate_Max;
+      // float forwardout = norm_input(forwardstick) *Speed_x_Max;
+      // float lateralout = norm_input(lateralstick)*Speed_y_Max;
+
+      float roll_desired = rollstick*Roll_Max;
+      float pitch_desired = pitchstick*Pitch_Max;
+      float yaw_rate_desired = yawstick*Yaw_Rate_Max;
+      float forwardout = forwardstick *Speed_x_Max;
+      float lateralout = lateralstick*Speed_y_Max;
+
+      uint32_t dt_ctrl = (fms_bus.fms_rc_input->timestamp >= last_timestamp) ? (fms_bus.fms_rc_input->timestamp - last_timestamp) : (0xFFFFFFFF - last_timestamp + fms_bus.fms_rc_input->timestamp);
+      last_timestamp = fms_bus.fms_rc_input->timestamp;
+      depth_desired += norm_input(throttlestick)*Speed_z_Max * dt_ctrl;
+
+      //传感器角度数据
+      float roll_feedback = fms_bus.fms_ins_bus->imu->ang_roll;
+      float pitch_feedback = fms_bus.fms_ins_bus->imu->ang_pitch;
+      float yaw_feedback = fms_bus.fms_ins_bus->imu->ang_yaw;
+
+      //传感器角速度数据
+      float roll_rate_feedback = fms_bus.fms_ins_bus->imu->gyr_x;
+      float pitch_rate_feedback = fms_bus.fms_ins_bus->imu->gyr_y;
+      float yaw_rate_feedback = fms_bus.fms_ins_bus->imu->gyr_z;
+
+      // if(yaw_feedback > 180)
+      // {
+      //     yaw_feedback = yaw_feedback - 360;
+      //     yaw_rate_feedback = - yaw_rate_feedback;
+      // }
+
+      //深度反馈
+      float depth_feedback = fms_bus.fms_ins_bus->bar->depth;
+      
+
+
+      
+      
+      if ((last_mode == Stabilize || last_mode == Depthhold || last_mode == Manual) && cur_mode == Atthold)
+      {
+          fms_bus.fms_out.phi_cmd = roll_feedback;
+          fms_bus.fms_out.theta_cmd = pitch_feedback;
+          fms_bus.fms_out.psi_cmd = yaw_feedback;
+          fms_bus.fms_out.z_cmd = depth_desired;
+      }
+      else if ((last_mode == Stabilize || last_mode == Atthold || last_mode == Manual) && cur_mode == Depthhold)
+      {
+          fms_bus.fms_out.phi_cmd = roll_desired;
+          fms_bus.fms_out.theta_cmd = pitch_desired;
+          fms_bus.fms_out.r_cmd = yaw_rate_desired;
+          fms_bus.fms_out.z_cmd = depth_feedback;
+      }
+      else if(last_mode == Atthold && cur_mode == Atthold)
+      {
+          fms_bus.fms_out.z_cmd = depth_desired;
+      }
+      else if(last_mode == Depthhold && cur_mode == Depthhold)
+      {
+          fms_bus.fms_out.phi_cmd = roll_desired;
+          fms_bus.fms_out.theta_cmd = pitch_desired;
+          fms_bus.fms_out.r_cmd = yaw_rate_desired;
+      }
+      else{
+          fms_bus.fms_out.phi_cmd = roll_desired;
+          fms_bus.fms_out.theta_cmd = pitch_desired;
+          fms_bus.fms_out.r_cmd = yaw_rate_desired;
+          fms_bus.fms_out.z_cmd = depth_desired;
+      }
+      fms_bus.fms_out.u_cmd = forwardout;
+      fms_bus.fms_out.v_cmd = lateralout;
+    }
+    last_mode = cur_mode;
   }
-  else if (1)//原条件gcs_updated
+  else if (0)//原条件gcs_updated 未完成
   {
     
 

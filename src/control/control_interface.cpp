@@ -35,7 +35,7 @@ TimeTag ctrl_interval ={
 };
 
 
-
+static void Manual_control();
 
 static void roll_pitch_control(uint32_t set_roll, uint32_t set_pitch);
 
@@ -97,7 +97,16 @@ void control_interface_step(uint32_t timestamp)
 }
 
 
+static void Manual_control()
+{
+    ctrl_bus.depth_controller.forward_thrust = ctrl_bus.ctrl_fms_bus->fms_out.u_cmd;
+    ctrl_bus.depth_controller.lateral_thrust = ctrl_bus.ctrl_fms_bus->fms_out.v_cmd;
+    ctrl_bus.depth_controller.throttle_thrust = ctrl_bus.ctrl_fms_bus->fms_out.w_cmd;
+    ctrl_bus.att_controller.roll_thrust = ctrl_bus.ctrl_fms_bus->fms_out.p_cmd;
+    ctrl_bus.att_controller.pitch_thrust = ctrl_bus.ctrl_fms_bus->fms_out.q_cmd;
+    ctrl_bus.att_controller.yaw_thrust = ctrl_bus.ctrl_fms_bus->fms_out.r_cmd;
 
+}
 
 static void roll_pitch_control(uint32_t set_roll, uint32_t set_pitch)
 {
@@ -204,22 +213,31 @@ static void control_step()
 {
     if(ctrl_bus.ctrl_fms_bus->fms_out.status == Arm)
     {
-        ctrl_bus.att_controller.roll_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_roll;
-        ctrl_bus.att_controller.pitch_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_pitch;
-        ctrl_bus.att_controller.yaw_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_yaw;
+        if(ctrl_bus.ctrl_fms_bus->fms_out.mode == Manual)
+        {
+            Manual_control();
+            thrust_alloc();
+        }
+        else
+        {
+            ctrl_bus.att_controller.roll_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_roll;
+            ctrl_bus.att_controller.pitch_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_pitch;
+            ctrl_bus.att_controller.yaw_pid.fb = ctrl_bus.ctrl_ins_bus->imu->ang_yaw;
 
-        ctrl_bus.att_controller.roll_rate_pid.fb = ctrl_bus.ctrl_ins_bus->imu->gyr_x;
-        ctrl_bus.att_controller.pitch_rate_pid.fb = ctrl_bus.ctrl_ins_bus->imu->gyr_y;
-        ctrl_bus.att_controller.yaw_rate_pid.fb = ctrl_bus.ctrl_ins_bus->imu->gyr_z;
+            ctrl_bus.att_controller.roll_rate_pid.fb = ctrl_bus.ctrl_ins_bus->imu->gyr_x;
+            ctrl_bus.att_controller.pitch_rate_pid.fb = ctrl_bus.ctrl_ins_bus->imu->gyr_y;
+            ctrl_bus.att_controller.yaw_rate_pid.fb = ctrl_bus.ctrl_ins_bus->imu->gyr_z;
 
-        ctrl_bus.depth_controller.depth_pid.fb = ctrl_bus.ctrl_ins_bus->bar->depth;
-        ctrl_bus.depth_controller.depth_vel_pid.fb = ctrl_bus.ctrl_ins_bus->bar->depvel;
+            ctrl_bus.depth_controller.depth_pid.fb = ctrl_bus.ctrl_ins_bus->bar->depth;
+            ctrl_bus.depth_controller.depth_vel_pid.fb = ctrl_bus.ctrl_ins_bus->bar->depvel;
 
-        roll_pitch_control(ctrl_bus.ctrl_fms_bus->fms_out.phi_cmd, ctrl_bus.ctrl_fms_bus->fms_out.theta_cmd);
-        yaw_rate_control(ctrl_bus.ctrl_fms_bus->fms_out.r_cmd);
-        depth_control(ctrl_bus.ctrl_fms_bus->fms_out.z_cmd);
-        forward_lateral_control(ctrl_bus.ctrl_fms_bus->fms_out.u_cmd, ctrl_bus.ctrl_fms_bus->fms_out.v_cmd);
-        thrust_alloc();
+            roll_pitch_control(ctrl_bus.ctrl_fms_bus->fms_out.phi_cmd, ctrl_bus.ctrl_fms_bus->fms_out.theta_cmd);
+            yaw_rate_control(ctrl_bus.ctrl_fms_bus->fms_out.r_cmd);
+            depth_control(ctrl_bus.ctrl_fms_bus->fms_out.z_cmd);
+            forward_lateral_control(ctrl_bus.ctrl_fms_bus->fms_out.u_cmd, ctrl_bus.ctrl_fms_bus->fms_out.v_cmd);
+            thrust_alloc();
+        }
+        
     }
     else
     {

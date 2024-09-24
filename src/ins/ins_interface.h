@@ -59,13 +59,5 @@ typedef struct {
 void ins_interface_init();
 void ins_interface_step(uint32_t timestamp);
 
-static void imu_update(uint32_t timestamp);
 
-static void mag_update(uint32_t timestamp);
-
-static void bar_update(uint32_t timestamp);
-
-static void rnf_update(uint32_t timestamp);
-
-static void ins_step();
 #endif // INS_INTERFACE_H

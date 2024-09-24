@@ -57,23 +57,7 @@ typedef struct
 } CTRL_Bus;
 
 
-static void roll_pitch_control(uint32_t set_roll, uint32_t set_pitch);
 
-static void yaw_rate_control(uint32_t set_yaw_rate);
-
-static void yaw_heading_control(uint32_t set_yaw);
-
-static void depth_control(uint32_t set_depth);
-
-static void depth_rate_control(uint32_t set_depth_vel);
-
-static void forward_lateral_control(uint32_t set_forward, uint32_t set_lateral);
-
-static void thrust_alloc();
-
-static void thrust_zero();
-
-static void control_step();
 
 void control_interface_init(void);
 

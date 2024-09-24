@@ -13,11 +13,15 @@
 #define JOYSTICK_OUTPUT_MIN     -1.0f
 #define JOYSTICK_OUTPUT_MAX     1.0f
 
+#define JOYSTICK_READ_MIN1       -1.0f
+#define JOYSTICK_READ_MAX1       1.0f
+#define JOYSTICK_READ_NEUTRAL1   0.0f
+
 
 /* ----------------------- RC Switch Definition----------------------------- */
 #define RC_SW_UP                ((uint16_t)1)
-#define RC_SW_MID               ((uint16_t)3)
-#define RC_SW_DOWN              ((uint16_t)2)
+#define RC_SW_MID               ((uint16_t)0)
+#define RC_SW_DOWN              ((uint16_t)-1)
 #define switch_is_down(s)       (s == RC_SW_DOWN)
 #define switch_is_mid(s)        (s == RC_SW_MID)
 #define switch_is_up(s)         (s == RC_SW_UP)
@@ -26,12 +30,15 @@
 #define Speed_x_Max 0.5
 #define Speed_y_Max 0.5
 #define Speed_z_Max 0.5
+
 #define Acc_z_Max 0.1
 
 #define Roll_Max 0.34
 #define Pitch_Max 0.34
 #define Yaw_Max 0.785
 #define Yaw_Rate_Max 2.65
+#define Roll_Rate_Max 2.65
+#define Pitch_Rate_Max 2.65
 
 typedef enum
 {
@@ -43,7 +50,8 @@ typedef enum
 {       
   Stabilize = 0,  
   Atthold,
-  Depthhold,            
+  Depthhold,
+  Manual,            
 } mode_list;
 
 
@@ -93,7 +101,7 @@ typedef struct {
 
 typedef struct
 {
-  const RC_input_t *fms_rc_input;
+  RC_input_t *fms_rc_input;
   //const GCS_input_t *fms_gcs_input;
   const INS_Bus *fms_ins_bus;
   FMS_Out fms_out;
@@ -101,10 +109,5 @@ typedef struct
 
 void fms_interface_init();
 void fms_interface_step(uint32_t timestamp);
-static float norm_input(int16_t radio_in);
-static float Limit(float pwm, float min, float max);
-static float absself(float num);
-static float deadzone_range(float num1, float num2);
-static void FMS_step(void);
 
 #endif
