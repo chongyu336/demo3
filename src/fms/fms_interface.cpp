@@ -1,10 +1,10 @@
 #include "fms_interface.h"
-
+#include "gcs_control.h"
 extern RC_input_t rc_input;
-extern GCS_input_t gcs_input;
+//extern GCS_input_t gcs_input;
 extern INS_Bus ins_bus;
 extern bool rc_updated;
-extern bool gcs_updated;
+
 
 FMS_Bus fms_bus;
 
@@ -72,19 +72,19 @@ void fms_interface_init()
   gcs_control_init();
 }
 
-uint32_t last_timestamp;
+static uint32_t last_timestamp;
 void fms_interface_step(uint32_t timestamp)
 {
   //遥控器的优先级高
   if (rc_updated)
   {
     fms_bus.fms_rc_input = &rc_input;
-    fms_bus.fms_rc_input->timestamp = timestamp;
+    //fms_bus.fms_rc_input->timestamp = timestamp;
   }
   else
   {
-    fms_bus.fms_gcs_input = &gcs_input;
-    fms_bus.fms_gcs_input->timestamp = timestamp;
+    //fms_bus.fms_gcs_input = &gcs_input;
+    //fms_bus.fms_gcs_input->timestamp = timestamp;
   }
   fms_bus.fms_ins_bus = &ins_bus;
 
@@ -112,11 +112,11 @@ static void FMS_step(void)
     }
     //模式判断
     //待实现
-    if(fms_bus.fms_rc_input->sw2 == )
+    if(1) //原条件fms_bus.fms_rc_input->sw2 ==
     {
-      fms_bus.fms_out.mode = 
+      //fms_bus.fms_out.mode = 
     }
-    else if(fms_bus.fms_rc_input->sw3 == )
+    else if(1) //原条件fms_bus.fms_rc_input->sw3 == 
     {
 
     }
@@ -129,7 +129,7 @@ static void FMS_step(void)
     float lateralstick = deadzone_range(fms_bus.fms_rc_input->ch6,50);    
 
     //摄像头舵机控制
-    fms_bus.fms_out.servo_cmd = ;
+    //fms_bus.fms_out.servo_cmd = ;
 
     
     //杆位输入，-1.0-1.0
@@ -201,7 +201,7 @@ static void FMS_step(void)
     fms_bus.fms_out.v_cmd = lateralout;
 
   }
-  elif (gcs_updated)
+  else if (1)//原条件gcs_updated
   {
     
 

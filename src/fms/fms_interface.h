@@ -3,9 +3,8 @@
 
 #include "rc_control.h"
 #include "gcs_control.h"
-//#include "gcs_control.h"
-#include <main.h>
-#include "ins_interface.h"
+#include "../../include/main.h"
+#include "../ins/ins_interface.h"
 
 
 #define JOYSTICK_READ_MIN       1000
@@ -95,7 +94,7 @@ typedef struct {
 typedef struct
 {
   const RC_input_t *fms_rc_input;
-  const GCS_input_t *fms_gcs_input;
+  //const GCS_input_t *fms_gcs_input;
   const INS_Bus *fms_ins_bus;
   FMS_Out fms_out;
 } FMS_Bus;

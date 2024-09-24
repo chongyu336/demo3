@@ -1,5 +1,13 @@
+/*
+ * @Author: ADSW514610085 Z514610085@163.com
+ * @Date: 2024-09-20 10:55:02
+ * @LastEditors: ADSW514610085 Z514610085@163.com
+ * @LastEditTime: 2024-09-23 16:27:58
+ * @FilePath: \demo3\src\fms\rc_control.cpp
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #include "rc_control.h"
-#include "systim.h"
+#include "../systim/systim.h"
 #include "ppm.h"
 
 bool rc_updated;
@@ -18,7 +26,7 @@ void rc_control_init(void)
 }
 //将PPM转成rc的输入信号
 //待实现
-static void ppm_to_rc(void)
+ void ppm_to_rc(void)
 {
     rc_input.ch1 =ppmInst.speed[0];
     rc_input.ch2 =ppmInst.speed[1];

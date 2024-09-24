@@ -1,8 +1,8 @@
 #include "sensor_driver.h"
-#include "systim.h"
+#include "../systim/systim.h"
 #include "i2c.h"
-#include "uart_imu.h"
-#include "uart_init.h"
+#include "../communication/uart_imu.h"
+#include "../communication/uart_init.h"
 
 extern float pressure, temperature;
 extern UartIMU uartImu;

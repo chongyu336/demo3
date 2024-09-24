@@ -2,13 +2,13 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2024-09-20 10:55:02
  * @LastEditors: ADSW514610085 Z514610085@163.com
- * @LastEditTime: 2024-09-23 13:51:23
+ * @LastEditTime: 2024-09-23 15:54:36
  * @FilePath: \demo3\src\control\rc_control.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #ifndef RC_CONTROL_H
 #define RC_CONTROL_H
-
+#include "stm32f4xx_hal.h" 
 typedef struct
 {
     uint32_t timestamp;
@@ -32,5 +32,5 @@ void rc_control_init(void);
 
 void pilot_cmd_collect();
 
-static void ppm_to_rc(void);
+void ppm_to_rc(void);
 #endif

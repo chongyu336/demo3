@@ -11,7 +11,7 @@
 
 
 #include "sensor_driver.h"
-#include "systim.h"
+#include "../systim/systim.h"
 //#include "uart_imu.h"
 
 typedef struct {

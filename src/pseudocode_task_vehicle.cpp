@@ -2,9 +2,9 @@
 #include "stm32f4xx_hal.h" //不会出现数字类型定义错误
 //static struct rtos_event event_vehicle;
 //static struct rtos_timer timer_vehicle;
-#include "ins_interface.h"
-#include "fms_interface.h"
-#include "control_interface.h"
+#include "ins/ins_interface.h"
+#include "fms/fms_interface.h"
+#include "control/control_interface.h"
 /**
  * @brief Vehicle task init
  */
@@ -23,13 +23,13 @@ void task_vehicle_init(void)
     //rtos_event_init(&event_vehicle, "vehicle", FLAG);
     
     /* register a 1kHz timer connected with event */
-    rtos_timer_create(&timer_vehicle, "vehicle", timer_vehicle_update, NULL, 1, TIMER_FLAG_PERIODIC);
-    rtos_timer_start(&timer_vehicle);
+    //rtos_timer_create(&timer_vehicle, "vehicle", timer_vehicle_update, NULL, 1, TIMER_FLAG_PERIODIC);
+    //rtos_timer_start(&timer_vehicle);
 }
 
 static void timer_vehicle_update(void* parameter)
 {
-    rtos_event_send(&event_vehicle, EVENT_VEHICLE_UPDATE);
+   // rtos_event_send(&event_vehicle, EVENT_VEHICLE_UPDATE);
 }
 
 /**
@@ -41,16 +41,19 @@ void task_vehicle_entry(void* parameter)
     static uint32_t time_start = 0;
     uint32_t time_now;
     uint32_t timestamp;
-    rt_err_t res;
-    rt_uint32_t recv_set = 0;
-    uint32_t wait_set = EVENT_VEHICLE_UPDATE;
+    uint32_t ins_period = 100;
+    uint32_t fms_period = 100;
+    //rt_err_t res;
+   // rt_uint32_t recv_set = 0;
+    //uint32_t wait_set = EVENT_VEHICLE_UPDATE;
 
     while (1) {
-        res = rtos_event_recv(&event_vehicle, wait_set, FLAG, &recv_set);
+        //res = rtos_event_recv(&event_vehicle, wait_set, FLAG, &recv_set);
 
-        if (res == 0) {
-            if (recv_set & EVENT_VEHICLE_UPDATE) {
-
+        if (1) {
+            //原条件res==0
+            if (1) {
+            //原条件recv_set & EVENT_VEHICLE_UPDATE        
                 time_now = systime_now_ms();
                 /* record loop start time */
                 if (time_start == 0) {
@@ -69,14 +72,14 @@ void task_vehicle_entry(void* parameter)
                 gcs_cmd_collect();
 
                 /* run INS model every ins_period */
-                PERIOD_EXECUTE(ins_step, ins_period, time_now, ins_interface_step(timestamp););
+                //PERIOD_EXECUTE(ins_step, ins_period, time_now, ins_interface_step(timestamp));
                 /* run FMS model every fms_period */
-                PERIOD_EXECUTE(fms_step, fms_period, time_now, fms_interface_step(timestamp););
+               // PERIOD_EXECUTE(fms_step, fms_period, time_now, fms_interface_step(timestamp));
                 /* run Controller model every control_period */
-                PERIOD_EXECUTE(control_step, control_period, time_now, control_interface_step(timestamp););
+                //PERIOD_EXECUTE(control_step, control_period, time_now, control_interface_step(timestamp));
 
-                /* send actuator command */3
-                send_actuator_cmd();
+                /* send actuator command */
+                //send_actuator_cmd();
             }
         }
     }
