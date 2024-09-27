@@ -58,6 +58,6 @@ typedef struct {
 
 void ins_interface_init();
 void ins_interface_step(uint32_t timestamp);
-
+void task_vehicle_init(void);
 
 #endif // INS_INTERFACE_H

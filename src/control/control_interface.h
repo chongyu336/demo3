@@ -13,20 +13,8 @@
 #include "main.h"
 #include "../ins/ins_interface.h"
 
-/*typedef enum
-{
-  Disarm = 0,           
-  Arm,              
-} fms_status;
-重定义了
-typedef enum
-{
-  Stabilize = 0,         
-  Atthold,
-  Depthhold,            
-} fms_mode;
-重定义了
-*/
+#define MOTORS_MAX_NUM_MOTORS 6
+
 
 typedef struct {
     PID_CLASS roll_pid;

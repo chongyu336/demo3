@@ -8,7 +8,7 @@
 #include <stm32f4xx_hal.h>
 #include <pinConfig.h>
 
-#define USE_I2C (1)
+#define USE_I2C (0) // 1: use I2C, 0: not use I2C
 
 void GPIO_PINs_Init(void);
 void GPIO_analog_init(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
