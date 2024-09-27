@@ -18,6 +18,11 @@
 #include "fms/fms_interface.h"
 #include "control/control_interface.h"
 
+#include "stm32f4xx_hal.h"
+#include "ins/ins_interface.h"
+#include "fms/fms_interface.h"
+#include "control/control_interface.h"
+
 // ------------------------------------------------------------------------------------
 uint64_t adcTick = 0;
 sAdcVal adcVal;
@@ -27,6 +32,8 @@ static void adc_callback(sAdcVal *val)
     adcVal = *val;
     adcTick++;
 }
+
+extern float motor_out[MOTORS_MAX_NUM_MOTORS];
 
 extern float motor_out[MOTORS_MAX_NUM_MOTORS];
 
@@ -116,6 +123,34 @@ void vThreadSetup(void *pvParameters)
                
         
 
+        
+               time_now = systime_now_ms();
+                /* record loop start time */
+                if (time_start == 0) {
+                    time_start = time_now;
+                }
+                /* the model simulation start from 0, so we calcualtet the timestamp relative to start time */
+                timestamp = time_now - time_start;
+
+                /* collect sensor data */
+                sensor_collect();
+
+                /* collect RC command */
+                pilot_cmd_collect();
+
+                /* collect GCS command */
+                gcs_cmd_collect();
+
+                //motor_out[]
+                //pwm_speed_set(1, 0.1);
+               
+
+              
+
+                
+               
+        
+
         // adc_softTrigger();
 
         // can_test(0); // id可以选0或者1
@@ -141,6 +176,7 @@ void vThreadSetup(void *pvParameters)
 
         // HAL_GetTick();
 
+        osDelay(100);
         osDelay(100);
 
         // ADC_DMA_callback();
