@@ -9,7 +9,7 @@
 #define MOTORS_MOT_5 4U
 #define MOTORS_MOT_6 5U
 
-#define MOTORS_MAX_NUM_MOTORS 6
+
 
 float motor1_factor[MOTORS_MAX_NUM_MOTORS] = {0,              0,              1.0f,           0,                  -1.0f,              1.0f}; 
 float motor2_factor[MOTORS_MAX_NUM_MOTORS] = {0,              0,              -1.0f,          0,                  -1.0f,              -1.0f};
