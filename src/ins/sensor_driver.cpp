@@ -108,7 +108,7 @@ static void mag_collect()
 
 static void bar_collect()
 {
-    float   temp[3];
+    //float   temp[3];
     if(check_timetag(&bar_interval))
     {
         // bar_data.dt_ms = systime_now_ms() - bar_data.timestamp_ms;
@@ -135,7 +135,7 @@ static void rnf_collect()
         //if()
         //{
         /************************************ */
-            rnf_data.distance_m = uartTof.longestDistance;
+        rnf_data.distance_m = uartTof.longestDistance;
         /************************************ */
         //}
     }

@@ -27,10 +27,10 @@ void task_vehicle_init(void)
     //rtos_timer_start(&timer_vehicle);
 }
 
-static void timer_vehicle_update(void* parameter)
+/*static void timer_vehicle_update(void* parameter)
 {
    // rtos_event_send(&event_vehicle, EVENT_VEHICLE_UPDATE);
-}
+}*/
 
 /**
  * @brief Vehicle entry task
@@ -38,11 +38,12 @@ static void timer_vehicle_update(void* parameter)
  */
 void task_vehicle_entry(void* parameter)
 {
-    static uint32_t time_start = 0;
+   uint32_t time_start = 0;
     uint32_t time_now;
-    uint32_t timestamp;
+   uint32_t timestamp;
+    /*
     uint32_t ins_period = 100;
-    uint32_t fms_period = 100;
+    uint32_t fms_period = 100;*/
     //rt_err_t res;
    // rt_uint32_t recv_set = 0;
     //uint32_t wait_set = EVENT_VEHICLE_UPDATE;
@@ -77,7 +78,7 @@ void task_vehicle_entry(void* parameter)
                // PERIOD_EXECUTE(fms_step, fms_period, time_now, fms_interface_step(timestamp));
                 /* run Controller model every control_period */
                 //PERIOD_EXECUTE(control_step, control_period, time_now, control_interface_step(timestamp));
-
+                
                 /* send actuator command */
                 //send_actuator_cmd();
             }

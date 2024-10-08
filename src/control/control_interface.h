@@ -13,8 +13,8 @@
 #include "main.h"
 #include "../ins/ins_interface.h"
 
-
 #define MOTORS_MAX_NUM_MOTORS 6
+
 
 typedef struct {
     PID_CLASS roll_pid;
