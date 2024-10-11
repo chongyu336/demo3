@@ -135,7 +135,7 @@ static void rnf_collect()
         //if()
         //{
         /************************************ */
-        rnf_data.distance_m = uartTof.longestDistance;
+        rnf_data.distance_m = uartTof.longestDistance[0];
         /************************************ */
         //}
     }

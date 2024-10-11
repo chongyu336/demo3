@@ -80,9 +80,23 @@ int SignalAquisition::sourceSelect(void)
     }
     case 4: // TOF longest distance
     {
-        // _sampleData.pvalue = &uartTof.longestDistance;
-        // //_sampleData.value = uartTof.longestDistance;
-        // _sampleData.isPointVal = true;
+        _sampleData.pvalue = &uartTof.longestDistance[0];
+        //_sampleData.value = uartTof.longestDistance[0];
+        _sampleData.isPointVal = true;
+        break;
+    }
+    case 5: // pressure
+    {
+        _sampleData.pvalue = &pressure;
+        //_sampleData.value = pressure;
+        _sampleData.isPointVal = true;
+        break;
+    }
+    case 6: // temperature
+    {
+        _sampleData.pvalue = &temperature;
+        //_sampleData.value = temperature;
+        _sampleData.isPointVal = true;
         break;
     }
     default:

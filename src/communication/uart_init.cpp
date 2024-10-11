@@ -28,10 +28,10 @@ extern void (*uart6_init)(void);
 CommunicationProtocol *userComm;
 UartComputer uartComputer; // uart1
 UartIMU uartImu;           // uart2
-UartAtkTof uartTof;        // uart3
+UartAtkTof uartTof;        // uart6
 // UartWifi uartWifi;      // uart4
 // UartSbus uartSbus;      // uart5
-UartComputer uart485; // uart6
+// UartComputer uart485; // uart6
 
 void uart_init(void)
 {
@@ -50,7 +50,7 @@ void uart_init(void)
     uint8_t imuTxHeader[2] = {0x55, 0xAF};
     uartImu.init(imuTxHeader, 256, huart2Handle);
 
-    // uartTof.init(256, huart3Handle);
+    uartTof.init(256, huart6Handle);
 
-    uart485.init(1024, huart6Handle);
+    //uart485.init(1024, huart6Handle);
 }

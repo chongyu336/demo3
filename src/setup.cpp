@@ -94,7 +94,6 @@ void vThreadSetup(void *pvParameters)
     task_vehicle_init();
     while (1)
     {
-
         time_now = systime_now_ms();
         /* record loop start time */
         if (time_start == 0)
@@ -134,48 +133,52 @@ void vThreadSetup(void *pvParameters)
         /* collect GCS command */
         gcs_cmd_collect();
 
-                //motor_out[]
-                //pwm_speed_set(1, 0.1);
-               
-                ins_interface_step(timestamp);  //需要改成period execute
-                fms_interface_step(timestamp);
-                control_interface_step(timestamp);
-                
-              
+        // motor_out[]
+        // pwm_speed_set(1, 0.1);
 
-                
-               
-        
+        {
+            // adc
+            // adc_softTrigger();
 
-        // adc_softTrigger();
+            // can
+            // can_test(0); // id可以选0或者1
 
-        // can_test(0); // id可以选0或者1
+            // 电调
+            // float duty = PWM_duty_get(3);
+            // sprintf(info, "duty = %0.1f\r\n", duty);
+            // usbComm.send(info);
 
-        // float duty = PWM_duty_get(3);
-        // sprintf(info, "duty = %0.1f\r\n", duty);
-        // usbComm.send(info);
+            // 激光测距仪
+            sprintf(info, "tof longest distance = %0.3fm\r\n", uartTof.longestDistance[0]);
+            usbComm.send(info);
 
-        // sprintf(info, "tof longest distance = %0.3fm\r\n", uartTof.longestDistance);
-        //  usbComm.send(info);
+            // 水压计
+            // sprintf(info, "water pressure : %0.1fmbar, temperature : %0.1fC\r\n", pressure, temperature);
+            // usbComm.send(info);
 
-        // if (ppmInst.IsUpdated())
-        // {
-        //     sprintf(info, "ppm channels=%d, value:[%0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f]\r\n", ppmInst.ppmChannels,
-        //             ppmInst.speed[0], ppmInst.speed[1], ppmInst.speed[2], ppmInst.speed[3], ppmInst.speed[4],
-        //             ppmInst.speed[5], ppmInst.speed[6], ppmInst.speed[7], ppmInst.speed[8], ppmInst.speed[9]);
-        //     usbComm.send(info);
-        // }
+            // ppm遥控器
+            // if (ppmInst.IsUpdated())
+            // {
+            //     sprintf(info, "ppm channels=%d, value:[%0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f, %0.1f]\r\n", ppmInst.ppmChannels,
+            //             ppmInst.speed[0], ppmInst.speed[1], ppmInst.speed[2], ppmInst.speed[3], ppmInst.speed[4],
+            //             ppmInst.speed[5], ppmInst.speed[6], ppmInst.speed[7], ppmInst.speed[8], ppmInst.speed[9]);
+            //     usbComm.send(info);
+            // }
 
-        // W25QXX_test_read(info);
-        // usbComm.send(info);
-        // uartImu.imuHandle.zitai[0]
+            // flash
+            // W25QXX_test_read(info);
+            // usbComm.send(info);
 
-        // HAL_GetTick();
+            // imu
+            // sprintf(info, "imu zitai : [%0.3f, %0.3f, %0.3f]\r\n", uartImu.imuHandle.zitai[0], uartImu.imuHandle.zitai[1], uartImu.imuHandle.zitai[2]);
+            // usbComm.send(info);
 
-        osDelay(100);
-        osDelay(100);
+            // HAL_GetTick();
 
-        // ADC_DMA_callback();
+            osDelay(2000);
+
+            // ADC_DMA_callback();
+        }
     }
 
     // 查看任务stack是否溢出

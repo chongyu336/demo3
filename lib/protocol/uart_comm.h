@@ -17,7 +17,7 @@ class UartComm : public CommunicationProtocol
 {
 public:
     uint32_t rxInterval, txInterval; // 接收/发送的间隔，默认1ms
-    void init(int sendSize, UART_HandleTypeDef *huart);
+    virtual void init(int sendSize, UART_HandleTypeDef *huart);
 
     // ---------- 以下内容基本可以不用修改, 也不会被用到(除了send) -------------------------------------------
 public:
@@ -32,13 +32,13 @@ public:
     virtual uint8_t send(char *str);
     virtual uint8_t send(char cmd, uint8_t *data, uint32_t datalength);
 
-private:
+protected:
     bool _isInit; // 是否初始化过，检查是否串口已经可用
 
 protected:
     UART_HandleTypeDef *_hUartHandle;
     
-private:
+protected:
     uint8_t *_sendFifoMemory; // 这个是堆申请 malloc&free
     Fifo<uint8_t> _sendFifo;
     osMutexId _sendUartMutexId;

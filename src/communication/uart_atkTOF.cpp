@@ -1,71 +1,176 @@
 #include "uart_atkTOF.h"
 
+static void vTaskTofProcess(void *pvParameters)
+{
+    UartAtkTof *puartTof = (UartAtkTof *)pvParameters;
+    while (1)
+    {
+        if (puartTof->sendReady)
+        {
+            puartTof->rxIntervalTick = 0;
+            puartTof->sendReady = false;
+            uint8_t type = puartTof->_sensorType;
+            uint16_t id = puartTof->deviceID[puartTof->sendIndex++];
+            if (puartTof->sendIndex >= TOF_NUMBERS)
+                puartTof->sendIndex = 0;
+            uint8_t iswrite = 0;
+            uint8_t reg = TOF_READ_LONGEST_DISTANCE_CMD;
+            uint8_t *data = NULL;
+            uint8_t databytes = 2;
+            puartTof->send(type, id, iswrite, reg, databytes, data);
+        }
+        else
+        {
+            if (++puartTof->rxIntervalTick > TOF_RX_INTERVAL) //
+            {
+                puartTof->rxAnalysis();
+                puartTof->sendReady = true;
+            }
+            osDelay(1);
+        }
+    }
+}
+
 UartAtkTof::UartAtkTof()
 {
 }
 
+void UartAtkTof::init(int sendSize, UART_HandleTypeDef *huart)
+{
+    UartComm::init(sendSize, huart);
+
+    sendReady = true;
+    sendIndex = 0;
+    _hostHeader = 0x51;
+    _clientHeader = 0x55;
+    _sensorType = 0x0C;
+    rxIntervalTick = 0;
+    deviceID[0] = 0x2201;
+    // deviceID[1] = 0x2202;
+    // deviceID[2] = 0x2203;
+    // deviceID[3] = 0x2204;
+    // deviceID[4] = 0x2205;
+    // deviceID[5] = 0x2206;
+    // 要确保 串口接收任务的栈大小 足够 这里写256可能会导致栈溢出
+    osThreadDef(tofProcess, vTaskTofProcess, osPriority::osPriorityNormal, 0, 512);
+    _process_task_id = osThreadCreate(osThread(tofProcess), this);
+}
+
+uint8_t UartAtkTof::send(uint8_t type, uint16_t id, uint8_t iswrite, uint8_t regaddr, uint8_t datalen, uint8_t *data)
+{
+    if (!_isInit)
+        return 0;
+
+    int len = 9; // ATK-MS53L2M modbus host read command frame length
+    if (iswrite == 1)
+    {
+        len += datalen;
+    }
+
+    osMutexWait(_sendUartMutexId, osWaitForever);
+    while (_sendFifo.remainedSize() < len)
+    { // 等待其他任务释放fifo空间
+        osMutexRelease(_sendUartMutexId);
+        osDelay(1);
+        osMutexWait(_sendUartMutexId, osWaitForever);
+    }
+
+    int length;
+    uint8_t *header = (uint8_t *)_txFrame.getFrame(&length);
+    { // construct
+        header[0] = _hostHeader;
+        header[1] = type;
+        header[2] = ((id >> 8) & 0xFF);
+        header[3] = (id & 0xFF);
+        header[4] = iswrite;
+        header[5] = regaddr;
+        header[6] = datalen;
+        if (iswrite)
+        {
+            for (int i = 0; i < datalen; i++)
+            {
+                header[7 + i] = data[i];
+            }
+        }
+        length = len - 2; // 除去crc sum以外的长度
+        uint16_t sum = 0;
+        for (int i = 0; i < length; i++)
+        {
+            sum += header[i];
+        }
+        header[len - 2] = ((sum >> 8) & 0xFF);
+        header[len - 1] = (sum & 0xFF);
+    }
+    _sendFifo.write(header, len);
+
+    osMutexRelease(_sendUartMutexId);
+
+    return 0;
+}
+
 int UartAtkTof::rxAnalysis(const uint8_t *const recvBuf, uint32_t length)
 {
-	for (uint32_t i = 0; i < length; i++)
-	{
-		if (_rxFrame._index > 255)
-			_rxFrame._index = 0;
+    rxIntervalTick = 0;
+    for (uint32_t i = 0; i < length; i++)
+    {
+        if (_rxFrame._index > 255)
+            _rxFrame._index = 0;
 
-		_rxFrame._header[_rxFrame._index++] = recvBuf[i];
-		if (recvBuf[i] == 0x0A) // 一个帧结束符
-		{
-			dataAnalysis();
-			_rxFrame._index = 0;
-		}
-	}
-	return 0;
+        _rxFrame._header[_rxFrame._index++] = recvBuf[i];
+    }
+    return 0;
+}
+
+int UartAtkTof::rxAnalysis()
+{
+    // frame analysis
+    int len = _rxFrame._index;
+    _rxFrame._index = 0; // reset for next frame reception
+    if (len < 8)
+        return -1;
+    uint8_t *frame = _rxFrame._header;
+    if (frame[0] != _clientHeader)
+        return -2; // frame wrong
+    if (frame[1] != _sensorType)
+        return -3; // sensor wrong
+    if (frame[4] > 1)
+        return -4; // not read or write, fault
+
+    int sum = 0;
+    for (int i = 0; i < (len - 2); i++)
+    {
+        sum += frame[i];
+    }
+    if (((sum & 0xFF) != frame[len - 1]) || (((sum >> 8) & 0xFF) != frame[len - 2]))
+        return -5; // crc sum wrong
+
+    uint8_t datalen = frame[7];
+    if ((datalen + 10) != len)
+        return -6; // data length wrong
+
+    if (frame[4] == 0)
+    {
+        uint8_t reg = frame[6];
+        switch (reg)
+        {
+        case TOF_READ_LONGEST_DISTANCE_CMD:
+        {
+            uint16_t dist = ((frame[8] << 8) + frame[9]);
+            int index = sendIndex - 1;
+            if (index < 0)
+                index += TOF_NUMBERS;
+            longestDistance[index] = dist * 1e-3f; // 毫米转米
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    return 0;
 }
 
 void UartAtkTof::dataAnalysis()
 {
-	if (_rxFrame._index == 0)
-		return;
-	if (_rxFrame._header[_rxFrame._index - 2] != 0x0D) // 一个帧的结束符标记倒数第二位
-		return;
-
-	distanceData();
-}
-
-// 求取最长距离
-void UartAtkTof::distanceData()
-{
-	if (_rxFrame._index < 3) // 数据长度不满足 1data+2end minimum
-		return;
-
-	uint32_t tmp = 0;
-	uint32_t dataindex = _rxFrame._index - 3;
-	int cnt = 0;
-	bool isvalid = true;
-	while (1)
-	{
-		uint8_t btmp = _rxFrame._header[dataindex];
-		uint32_t tmp10 = 0;
-		if ((btmp >= '0') && (btmp <= '9'))
-		{
-			tmp10 = btmp - '0';
-			for (int i = 0; i < cnt; i++)
-			{
-				tmp10 *= 10;
-			}
-			tmp += tmp10;
-			cnt++;
-			if (dataindex == 0)
-				break;
-			dataindex--;
-		}
-		else
-		{ // 非数字
-			isvalid = false;
-			break;
-		}
-	}
-	if (isvalid)
-	{
-		longestDistance = tmp * 1e-3f; // 毫米转米
-	}
+    ;
 }
