@@ -134,8 +134,18 @@ void vThreadSetup(void *pvParameters)
         /* collect GCS command */
         gcs_cmd_collect();
 
-        // motor_out[]
-        // pwm_speed_set(1, 0.1);
+                //motor_out[]
+                //pwm_speed_set(1, 0.1);
+               
+                ins_interface_step(timestamp);  //需要改成period execute
+                fms_interface_step(timestamp);
+                control_interface_step(timestamp);
+                
+              
+
+                
+               
+        
 
         // adc_softTrigger();
 
