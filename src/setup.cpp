@@ -59,7 +59,6 @@ void vThreadSetup(void *pvParameters)
 
     tim_init();
     pwm_caputure_init();
-  
 
     W25QXX_Init();
     // W25QXX_test_write(info);
@@ -76,18 +75,18 @@ void vThreadSetup(void *pvParameters)
     // pwm_shutdown();
 
     // sampler.powerEnSet(10, 1); // 52V 电源常开
-    
-    //pwm_speed_set(0, 0.0f);
-    // pwm_speed_set(1, 0.5f);
-    // pwm_speed_set(2, 1.0f);
-    // pwm_speed_set(3, -0.5f);
-     //pwm_speed_set(4, -1.0f);
-    
-    //初始化
-    //osDelay(5000);
-    //pwm_speed_set(0, 0);
-    //osDelay(1000);
-    //pwm_speed_set(0, 0.1);
+
+    // pwm_speed_set(0, 0.0f);
+    //  pwm_speed_set(1, 0.5f);
+    //  pwm_speed_set(2, 1.0f);
+    //  pwm_speed_set(3, -0.5f);
+    // pwm_speed_set(4, -1.0f);
+
+    // 初始化
+    // osDelay(5000);
+    // pwm_speed_set(0, 0);
+    // osDelay(1000);
+    // pwm_speed_set(0, 0.1);
 
     uint32_t time_start = 0;
     uint32_t time_now;
@@ -95,61 +94,48 @@ void vThreadSetup(void *pvParameters)
     task_vehicle_init();
     while (1)
     {
-        
-               time_now = systime_now_ms();
-                /* record loop start time */
-                if (time_start == 0) {
-                    time_start = time_now;
-                }
-                /* the model simulation start from 0, so we calcualtet the timestamp relative to start time */
-                timestamp = time_now - time_start;
 
-                /* collect sensor data */
-                sensor_collect();
+        time_now = systime_now_ms();
+        /* record loop start time */
+        if (time_start == 0)
+        {
+            time_start = time_now;
+        }
+        /* the model simulation start from 0, so we calcualtet the timestamp relative to start time */
+        timestamp = time_now - time_start;
 
-                /* collect RC command */
-                pilot_cmd_collect();
+        /* collect sensor data */
+        sensor_collect();
 
-                /* collect GCS command */
-                gcs_cmd_collect();
+        /* collect RC command */
+        pilot_cmd_collect();
 
-                //motor_out[]
-                //pwm_speed_set(1, 0.1);
-               
+        /* collect GCS command */
+        gcs_cmd_collect();
 
-              
+        // motor_out[]
+        // pwm_speed_set(1, 0.1);
 
-                
-               
-        
+        time_now = systime_now_ms();
+        /* record loop start time */
+        if (time_start == 0)
+        {
+            time_start = time_now;
+        }
+        /* the model simulation start from 0, so we calcualtet the timestamp relative to start time */
+        timestamp = time_now - time_start;
 
-        
-               time_now = systime_now_ms();
-                /* record loop start time */
-                if (time_start == 0) {
-                    time_start = time_now;
-                }
-                /* the model simulation start from 0, so we calcualtet the timestamp relative to start time */
-                timestamp = time_now - time_start;
+        /* collect sensor data */
+        sensor_collect();
 
-                /* collect sensor data */
-                sensor_collect();
+        /* collect RC command */
+        pilot_cmd_collect();
 
-                /* collect RC command */
-                pilot_cmd_collect();
+        /* collect GCS command */
+        gcs_cmd_collect();
 
-                /* collect GCS command */
-                gcs_cmd_collect();
-
-                //motor_out[]
-                //pwm_speed_set(1, 0.1);
-               
-
-              
-
-                
-               
-        
+        // motor_out[]
+        // pwm_speed_set(1, 0.1);
 
         // adc_softTrigger();
 
@@ -159,8 +145,8 @@ void vThreadSetup(void *pvParameters)
         // sprintf(info, "duty = %0.1f\r\n", duty);
         // usbComm.send(info);
 
-        //sprintf(info, "tof longest distance = %0.3fm\r\n", uartTof.longestDistance);
-        // usbComm.send(info);
+        // sprintf(info, "tof longest distance = %0.3fm\r\n", uartTof.longestDistance);
+        //  usbComm.send(info);
 
         // if (ppmInst.IsUpdated())
         // {
@@ -189,8 +175,7 @@ void vThreadSetup(void *pvParameters)
     //        (int)uxTaskGetStackHighWaterMark(led_thread_id), (int)uxTaskGetStackHighWaterMark(uart_thread_id), (int)uxTaskGetStackHighWaterMark(NULL));
 }
 
-//uint32_t systime_now_ms()
+// uint32_t systime_now_ms()
 //{
 
 //}
-
