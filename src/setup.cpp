@@ -35,7 +35,22 @@ static void adc_callback(sAdcVal *val)
 
 extern float motor_out[MOTORS_MAX_NUM_MOTORS];
 
-extern float motor_out[MOTORS_MAX_NUM_MOTORS];
+
+
+TimeTag ins_timtag ={
+    .tag = 0,
+    .period = 100,
+};
+
+TimeTag fms_timtag ={
+    .tag = 0,
+    .period = 100,
+};
+
+TimeTag control_timtag ={
+    .tag = 0,
+    .period = 100,
+};
 
 void vThreadSetup(void *pvParameters)
 {
@@ -82,11 +97,16 @@ void vThreadSetup(void *pvParameters)
     //  pwm_speed_set(3, -0.5f);
     // pwm_speed_set(4, -1.0f);
 
-    // 初始化
-    // osDelay(5000);
-    // pwm_speed_set(0, 0);
-    // osDelay(1000);
-    // pwm_speed_set(0, 0.1);
+    //初始化
+    osDelay(10000);
+    pwm_speed_set(0, 0);
+    pwm_speed_set(1, 0);
+    pwm_speed_set(2, 0);
+    pwm_speed_set(3, 0);
+    pwm_speed_set(4, 0);
+    pwm_speed_set(5, 0);
+    
+    
 
     uint32_t time_start = 0;
     uint32_t time_now;
@@ -132,10 +152,21 @@ void vThreadSetup(void *pvParameters)
 
         /* collect GCS command */
         gcs_cmd_collect();
-
-        // motor_out[]
-        // pwm_speed_set(1, 0.1);
-
+        
+         /* run INS model every ins_period */
+        PERIOD_EXECUTE(&ins_timtag, time_now, ins_interface_step(timestamp));
+         /* run FMS model every fms_period */
+        PERIOD_EXECUTE(&fms_timtag, time_now, fms_interface_step(timestamp));
+        /* run Controller model every control_period */
+        PERIOD_EXECUTE(&control_timtag, time_now, control_interface_step(timestamp));
+                
+        pwm_speed_set(0,motor_out[0]);
+        pwm_speed_set(1,motor_out[1]);
+        pwm_speed_set(2,motor_out[2]);
+        pwm_speed_set(3,motor_out[3]);
+        pwm_speed_set(4,motor_out[4]);
+        pwm_speed_set(5,motor_out[5]);
+        
         {
             // adc
             // adc_softTrigger();

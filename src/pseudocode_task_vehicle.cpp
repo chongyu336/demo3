@@ -32,20 +32,20 @@ void task_vehicle_init(void)
 {
    // rtos_event_send(&event_vehicle, EVENT_VEHICLE_UPDATE);
 }*/
-TimeTag ins_timtag ={
-    .tag = 0,
-    .period = 100,
-};
+// TimeTag ins_timtag ={
+//     .tag = 0,
+//     .period = 100,
+// };
 
-TimeTag fms_timtag ={
-    .tag = 0,
-    .period = 100,
-};
+// TimeTag fms_timtag ={
+//     .tag = 0,
+//     .period = 100,
+// };
 
-TimeTag control_timtag ={
-    .tag = 0,
-    .period = 100,
-};
+// TimeTag control_timtag ={
+//     .tag = 0,
+//     .period = 100,
+// };
 /**
  * @brief Vehicle entry task
  * @param parameter
@@ -87,11 +87,11 @@ void task_vehicle_entry(void* parameter)
                 gcs_cmd_collect();
 
                 /* run INS model every ins_period */
-                PERIOD_EXECUTE(&ins_timtag, time_now, ins_interface_step(timestamp));
+                // PERIOD_EXECUTE(&ins_timtag, time_now, ins_interface_step(timestamp));
                 /* run FMS model every fms_period */
-                PERIOD_EXECUTE(&fms_timtag, time_now, fms_interface_step(timestamp));
+                // PERIOD_EXECUTE(&fms_timtag, time_now, fms_interface_step(timestamp));
                 /* run Controller model every control_period */
-                PERIOD_EXECUTE(&control_timtag, time_now, control_interface_step(timestamp));
+                // PERIOD_EXECUTE(&control_timtag, time_now, control_interface_step(timestamp));
                 
                 /* send actuator command */
                 //send_actuator_cmd();
