@@ -168,7 +168,7 @@ static void FMS_step(void)
     float forwardstick = deadzone_range(fms_bus.fms_rc_input->ch5,0.05);
     float lateralstick = deadzone_range(fms_bus.fms_rc_input->ch6,0.05);    
 
-    if(fms_bus.fms_out.mode = Manual)
+    if(fms_bus.fms_out.mode == Manual)
     { 
       float forwardout = forwardstick *Speed_x_Max;
       float lateralout = lateralstick*Speed_y_Max;
