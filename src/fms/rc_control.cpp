@@ -9,6 +9,7 @@
 #include "rc_control.h"
 #include "../systim/systim.h"
 #include "ppm.h"
+#include <math.h>
 
 bool rc_updated;
 RC_input_t rc_input;
@@ -34,10 +35,10 @@ void rc_control_init(void)
     rc_input.ch4 =ppmInst.speed[3];
     rc_input.ch5 =ppmInst.speed[4];
     rc_input.ch6 =ppmInst.speed[5];
-    rc_input.sw1 =ppmInst.speed[6];
-    rc_input.sw2 =ppmInst.speed[7];
-    rc_input.sw3 =ppmInst.speed[8];
-    rc_input.sw4 =ppmInst.speed[9];
+    rc_input.sw1 =round(ppmInst.speed[6]);
+    rc_input.sw2 =round(ppmInst.speed[7]);
+    rc_input.sw3 =round(ppmInst.speed[8]);
+    rc_input.sw4 =round(ppmInst.speed[9]);
  
 }
 
