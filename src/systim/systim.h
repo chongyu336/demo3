@@ -10,13 +10,26 @@
 #define SYSTIM_H
 #include "stm32f4xx_hal.h"
 
+
 typedef struct {
     uint32_t tag;
     uint32_t period;
 } TimeTag;
 
+
+
+#define PERIOD_EXECUTE(_step, _time_now, _operation)              \
+    do {                                                          \
+        if (check_timetag3(_step, _time_now)) { \
+            _operation;                                            \
+        }                                                         \
+    } while (0)
+
+
+
 uint32_t systime_now_ms();
 
 
 uint8_t check_timetag(TimeTag* timetag);
+uint8_t check_timetag3(TimeTag* timetag, uint32_t now);
 #endif

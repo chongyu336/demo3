@@ -38,10 +38,10 @@ void ins_interface_init()
 uint32_t last_timestamp;
 uint16_t last_depth;
 
-uint8_t imu_upadte;
-uint8_t mag_upadte;
-uint8_t bar_upadte;
-uint8_t rnf_upadte;
+uint8_t imu_flag;
+uint8_t mag_flag;
+uint8_t bar_flag;
+uint8_t rnf_flag;
 
 //update函数是将传感器数据搬运一下
 static void imu_update(uint32_t timestamp);
@@ -83,7 +83,7 @@ static void imu_update(uint32_t timestamp)
     imu_bus.acc_x = imu_data.acc_mDs2[0];
     imu_bus.acc_y = imu_data.acc_mDs2[1];
     imu_bus.acc_z = imu_data.acc_mDs2[2];
-    imu_upadte = 1;
+    imu_flag = 1;
 }
 
 static void mag_update(uint32_t timestamp)
@@ -92,7 +92,7 @@ static void mag_update(uint32_t timestamp)
     mag_bus.mag_x = mag_data.mag_gauss[0];
     mag_bus.mag_y = mag_data.mag_gauss[1];
     mag_bus.mag_z = mag_data.mag_gauss[2];
-    mag_upadte = 1;
+    mag_flag = 1;
 }
 
 static void bar_update(uint32_t timestamp)
@@ -101,7 +101,7 @@ static void bar_update(uint32_t timestamp)
     bar_bus.pressure = bar_data.pressure_pa;
     bar_bus.temperature = bar_data.temperature_deg;
     bar_bus.depth = bar_data.depth_m;
-    bar_upadte = 1;
+    bar_flag = 1;
 }
 
 
@@ -109,14 +109,14 @@ static void rnf_update(uint32_t timestamp)
 {
     rnf_bus.timestamp = timestamp;
     rnf_bus.distance = rnf_data.distance_m;
-    rnf_upadte = 1;
+    rnf_flag = 1;
 }
 
 static void ins_step()
 {
-    if(imu_upadte)
+    if(imu_flag)
     {
-        imu_upadte = 0;
+        imu_flag = 0;
         //滤波函数得到四元数和姿态角
         //待实现
         imu_bus.ang_roll = uartImu.imuHandle.zitai[0];
@@ -127,22 +127,22 @@ static void ins_step()
         imu_bus.quat[2] = uartImu.imuHandle.siyuanshu[2];
         imu_bus.quat[3] = uartImu.imuHandle.siyuanshu[3];
     }
-    if(mag_update)
+    if(mag_flag)
     {
-        mag_upadte = 0;
+        mag_flag = 0;
     }
-    if(bar_update)
+    if(bar_flag)
     {
-        bar_upadte = 0;
+        bar_flag = 0;
         uint32_t dt_dep = (bar_bus.timestamp >= last_timestamp) ? (bar_bus.timestamp - last_timestamp) : (0xFFFFFFFF - last_timestamp + bar_bus.timestamp);
         last_timestamp = bar_bus.timestamp;
         uint32_t dep_vel = (bar_bus.depth - last_depth) / dt_dep;
         last_depth = bar_bus.depth;
         bar_bus.depvel = dep_vel;
     }
-    if(rnf_update)
+    if(rnf_flag)
     {
-        rnf_upadte = 0;
+        rnf_flag = 0;
 
     }
 }

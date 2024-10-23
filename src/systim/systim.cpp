@@ -9,8 +9,9 @@
 #include "systim.h"
 #include "main.h"
 
-uint8_t check_timetag3(TimeTag* timetag, uint32_t now, uint32_t period)
+uint8_t check_timetag3(TimeTag* timetag, uint32_t now)
 {
+    uint32_t period = timetag->period;
     if (period > 0 && now - timetag->tag >= period) {
         timetag->tag = now;
         return 1;
